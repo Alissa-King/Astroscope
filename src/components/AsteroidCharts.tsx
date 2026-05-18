@@ -121,19 +121,31 @@ export default function AsteroidCharts({ data }: Props) {
           Nearest {Math.min(data.length, 8)} asteroids — circle radius ∝ estimated diameter · position ∝ miss distance
         </div>
         <div className="relative overflow-hidden rounded-xl bg-slate-950/60" style={{ height: 200 }}>
+          {(() => {
+            const slice = data.slice(0, 8);
+            const maxMiss = Math.max(...slice.map((a) => a.missMoon), 1);
+            const oneLDx = 80 + (1 / maxMiss) * 680;
+            return (
           <svg width="100%" height="200" viewBox="0 0 800 200" preserveAspectRatio="xMidYMid meet">
             {/* Earth */}
             <circle cx="60" cy="100" r="18" fill="#1d4ed8" opacity="0.9" />
             <circle cx="60" cy="100" r="18" fill="none" stroke="#3b82f6" strokeWidth="1" opacity="0.5" />
-            <text x="60" y="165" textAnchor="middle" fill="#3b82f6" fontSize="10" fontFamily="sans-serif">Earth</text>
+            <text x="60" y="170" textAnchor="middle" fill="#3b82f6" fontSize="10" fontFamily="sans-serif">Earth</text>
 
-            {/* Moon orbit reference */}
-            <ellipse cx="60" cy="100" rx="120" ry="30" fill="none" stroke="#f59e0b" strokeWidth="0.5" strokeDasharray="4 4" opacity="0.3" />
-            <text x="183" y="104" fill="#f59e0b" fontSize="8" fontFamily="monospace" opacity="0.6">1 LD</text>
+            {/* 1 LD reference line */}
+            {oneLDx < 780 && (
+              <>
+                <line x1={oneLDx} y1="20" x2={oneLDx} y2="175" stroke="#f59e0b" strokeWidth="0.8" strokeDasharray="4 4" opacity="0.4" />
+                <text x={oneLDx + 4} y="28" fill="#f59e0b" fontSize="8" fontFamily="monospace" opacity="0.7">1 LD</text>
+              </>
+            )}
 
             {/* Asteroids */}
-            {data.slice(0, 8).map((a, i) => {
-              const scaledX = 60 + (a.missMoon / 10) * 700;
+            {(() => {
+              const slice = data.slice(0, 8);
+              const maxMiss = Math.max(...slice.map((a) => a.missMoon), 1);
+              return slice.map((a, i) => {
+              const scaledX = 80 + (a.missMoon / maxMiss) * 680;
               const cy = 100 + (i % 3 - 1) * 40;
               const r = Math.max(3, Math.min(14, a.diameter * 20 + 3));
               const col = a.hazardous ? "#ef4444" : "#34d399";
@@ -147,8 +159,11 @@ export default function AsteroidCharts({ data }: Props) {
                   </text>
                 </g>
               );
-            })}
+            });
+            })()}
           </svg>
+            );
+          })()}
           <div className="absolute bottom-2 right-3 text-[9px] text-slate-700 font-mono">
             not to scale · x-axis = miss distance · circle = relative size
           </div>
