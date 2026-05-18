@@ -49,7 +49,8 @@ export default function SolarSystemOrrery() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   const animRef = useRef<number>(0);
-  const speedRef = useRef(1000);
+  const DEFAULT_SPEED = 30; // days per real second
+  const speedRef = useRef(DEFAULT_SPEED);
   const pausedRef = useRef(false);
   const simTimeRef = useRef(Date.now());
   const lastRealRef = useRef(Date.now());
@@ -57,7 +58,7 @@ export default function SolarSystemOrrery() {
   const simDateRef = useRef<Date>(new Date());
 
   // speed = days per real second; stored as log10 for slider
-  const [sliderVal, setSliderVal] = useState(2); // 10^2 = 100 days/s default
+  const [sliderVal, setSliderVal] = useState(Math.log10(DEFAULT_SPEED)); // ~30 days/s default
   const [paused, setPaused] = useState(false);
   const [simDate, setSimDate] = useState(new Date());
   const [tooltip, setTooltip] = useState<TooltipInfo | null>(null);
@@ -268,6 +269,12 @@ export default function SolarSystemOrrery() {
     setPaused((v) => !v);
   };
 
+  const resetToToday = () => {
+    simTimeRef.current = Date.now();
+    lastRealRef.current = Date.now();
+    setSimDate(new Date());
+  };
+
   const formatSpeed = (d: number) => {
     if (d >= 365) return `${(d / 365).toFixed(1)} yr/s`;
     if (d >= 30)  return `${(d / 30).toFixed(1)} mo/s`;
@@ -288,6 +295,14 @@ export default function SolarSystemOrrery() {
           }`}
         >
           {paused ? "▶ Resume" : "⏸ Pause"}
+        </button>
+
+        <button
+          onClick={resetToToday}
+          className="px-3 py-1.5 rounded-lg text-xs font-semibold border border-slate-700 bg-slate-800/60 text-slate-300 hover:bg-slate-700/60 hover:text-white transition-all"
+          title="Reset to today's date"
+        >
+          ↺ Today
         </button>
 
         {/* Speed presets */}

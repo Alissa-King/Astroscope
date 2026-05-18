@@ -49,13 +49,14 @@ export default function AsteroidOrbitViewer() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   const animRef = useRef<number>(0);
-  const speedRef = useRef(1000);
+  const DEFAULT_SPEED = 30; // days per real second
+  const speedRef = useRef(DEFAULT_SPEED);
   const pausedRef = useRef(false);
   const simTimeRef = useRef(Date.now());
   const lastRealRef = useRef(Date.now());
 
   const [selectedIdx, setSelectedIdx] = useState(0);
-  const [speed, setSpeed] = useState(1000);
+  const [speed, setSpeed] = useState(DEFAULT_SPEED);
   const [paused, setPaused] = useState(false);
   const [canvasSize, setCanvasSize] = useState(500);
   const [prefersReducedMotion, setPrefersReducedMotion] = useState(false);
@@ -84,8 +85,8 @@ export default function AsteroidOrbitViewer() {
 
     const now = Date.now();
     if (!pausedRef.current) {
-      const dtReal = now - lastRealRef.current;
-      simTimeRef.current += dtReal * speedRef.current;
+      const dtReal = now - lastRealRef.current; // ms
+      simTimeRef.current += dtReal * speedRef.current * 86400; // speedRef = days/s
     }
     lastRealRef.current = now;
 
@@ -283,11 +284,17 @@ export default function AsteroidOrbitViewer() {
         <div className="flex items-center gap-2 flex-1 max-w-xs">
           <span className="text-xs text-slate-500">Speed</span>
           <input
-            type="range" min={1} max={100000} step={1} value={speed}
-            onChange={(e) => setSpeed(Number(e.target.value))}
+            type="range" min={1} max={365} step={1} value={speed}
+            onChange={(e) => {
+              const v = Number(e.target.value);
+              setSpeed(v);
+              speedRef.current = v;
+            }}
             className="flex-1 accent-amber-400"
           />
-          <span className="text-xs text-amber-400 font-mono w-12">{speed}x</span>
+          <span className="text-xs text-amber-400 font-mono w-16 shrink-0">
+            {speed >= 365 ? "1 yr/s" : speed >= 30 ? `${(speed / 30).toFixed(1)} mo/s` : `${speed}d/s`}
+          </span>
         </div>
       </div>
 
