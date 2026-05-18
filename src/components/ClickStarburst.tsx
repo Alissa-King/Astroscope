@@ -15,11 +15,10 @@ export default function ClickStarburst() {
       for (let i = 0; i < count; i++) {
         const angle = (i / count) * 360 + Math.random() * (360 / count / 2);
         const dist = (30 + Math.random() * 40) * scale;
-        const size = (10 + Math.random() * 8) * scale;
+        const size = Math.round((10 + Math.random() * 8) * scale);
         const color = COLORS[Math.floor(Math.random() * COLORS.length)];
         const char = CHARS[Math.floor(Math.random() * CHARS.length)];
         const duration = 550 + Math.random() * 300;
-        const delay = Math.random() * 80;
 
         const rad = (angle * Math.PI) / 180;
         const dx = Math.cos(rad) * dist;
@@ -27,24 +26,26 @@ export default function ClickStarburst() {
 
         const star = document.createElement("span");
         star.textContent = char;
+        // Pre-center the element using pixel offsets so keyframes need no calc()
         star.style.cssText = `
-          position:fixed;left:${x}px;top:${y}px;
+          position:fixed;
+          left:${x - size / 2}px;
+          top:${y - size / 2}px;
           font-size:${size}px;color:${color};
           pointer-events:none;z-index:99999;
           text-shadow:0 0 6px ${color};
-          will-change:transform,opacity;
         `;
         document.body.appendChild(star);
 
         star.animate(
           [
-            { transform: "translate(-50%,-50%)", opacity: 1 },
-            { transform: `translate(calc(-50% + ${dx}px), calc(-50% + ${dy}px))`, opacity: 0 },
+            { transform: "translate(0,0)", opacity: 1 },
+            { transform: `translate(${dx}px,${dy}px)`, opacity: 0 },
           ],
-          { duration, delay, easing: "ease-out", fill: "both" }
+          { duration, easing: "ease-out", fill: "forwards" }
         );
 
-        setTimeout(() => star.remove(), duration + delay + 50);
+        setTimeout(() => star.remove(), duration + 50);
       }
     }
 
