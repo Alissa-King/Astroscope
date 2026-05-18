@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Telescope, Orbit, Satellite, ImageIcon, LayoutDashboard, Moon, Globe2, Rocket, Star } from "lucide-react";
+import { Telescope, Orbit, Satellite, ImageIcon, LayoutDashboard, Moon, Globe2, Rocket, Star, Sparkles } from "lucide-react";
 
 // Main nav links (always show label)
 const mainLinks = [
@@ -16,9 +16,10 @@ const mainLinks = [
 
 // Secondary links (icon + label on md+, icon-only on mobile)
 const extraLinks = [
-  { href: "/solar-system", label: "Orrery",    icon: Globe2,  color: "sky"    },
-  { href: "/launches",     label: "Launches",  icon: Rocket,  color: "amber"  },
-  { href: "/star-chart",   label: "Sky Chart", icon: Star,    color: "indigo" },
+  { href: "/solar-system", label: "Orrery",      icon: Globe2,    color: "sky"    },
+  { href: "/launches",     label: "Launches",    icon: Rocket,    color: "amber"  },
+  { href: "/star-chart",   label: "Sky Chart",   icon: Star,      color: "indigo" },
+  { href: "/exoplanets",   label: "Exoplanets",  icon: Sparkles,  color: "teal"   },
 ];
 
 const colorMap: Record<string, { active: string; dot: string }> = {
@@ -27,6 +28,7 @@ const colorMap: Record<string, { active: string; dot: string }> = {
   violet:  { active: "bg-violet-500/15 text-violet-300 border-violet-500/30", dot: "bg-violet-400" },
   amber:   { active: "bg-amber-500/15 text-amber-300 border-amber-500/30",    dot: "bg-amber-400"  },
   emerald: { active: "bg-emerald-500/15 text-emerald-300 border-emerald-500/30", dot: "bg-emerald-400" },
+  teal:    { active: "bg-teal-500/15 text-teal-300 border-teal-500/30",       dot: "bg-teal-400"   },
 };
 
 function NavLink({
@@ -64,9 +66,9 @@ export default function Nav() {
       <div className="max-w-7xl mx-auto px-4 flex items-center gap-1 h-14">
         {/* Wordmark */}
         <Link href="/" className="flex items-center gap-2 mr-3 group shrink-0">
-          <div className="relative w-7 h-7 flex items-center justify-center">
+          <div className="relative w-7 h-7 flex items-center justify-center" data-logo-trigger>
             <div className="absolute inset-0 rounded-full bg-sky-500/10 group-hover:bg-sky-500/20 transition-colors" />
-            <span className="text-sky-400 text-lg leading-none group-hover:text-sky-300 transition-colors">✦</span>
+            <span className="text-sky-400 text-lg leading-none group-hover:text-sky-300 transition-colors" title="Click 5× for a surprise">✦</span>
           </div>
           <div className="flex-col leading-none hidden sm:flex">
             <span className="text-xs font-bold text-white tracking-widest uppercase">AstroScope</span>
