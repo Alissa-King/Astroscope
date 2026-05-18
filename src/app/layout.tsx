@@ -3,6 +3,7 @@ import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import Nav from "@/components/Nav";
 import StarfieldBackground from "@/components/StarfieldBackground";
+import ClickStarburst from "@/components/ClickStarburst";
 
 const geistSans = Geist({ variable: "--font-geist-sans", subsets: ["latin"] });
 const geistMono = Geist_Mono({ variable: "--font-geist-mono", subsets: ["latin"] });
@@ -33,6 +34,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           <div className="nebula-blob nebula-blob-4" />
         </div>
 
+        <ClickStarburst />
         <Nav />
         <main className="flex-1 relative z-10">{children}</main>
 
