@@ -16,6 +16,11 @@ interface Particle {
   life: number;
 }
 
+interface CosmosMessage {
+  born: number;
+  life: number;
+}
+
 function addBurst(particles: Particle[], x: number, y: number, count = 8, scale = 1) {
   const now = performance.now();
   for (let i = 0; i < count; i++) {
@@ -36,6 +41,7 @@ function addBurst(particles: Particle[], x: number, y: number, count = 8, scale 
 
 export default function ClickStarburst() {
   const particlesRef = useRef<Particle[]>([]);
+  const messagesRef = useRef<CosmosMessage[]>([]);
   const logoClicksRef = useRef(0);
   const logoTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
@@ -73,6 +79,31 @@ export default function ClickStarburst() {
         ctx.restore();
         return true;
       });
+
+      // Cosmos message — fully canvas-rendered, no DOM animation API
+      messagesRef.current = messagesRef.current.filter((m) => {
+        const t = (now - m.born) / m.life;
+        if (t >= 1) return false;
+        // Fade in (0→0.2), hold (0.2→0.7), fade out (0.7→1)
+        const alpha = t < 0.2 ? t / 0.2 : t < 0.7 ? 1 : 1 - (t - 0.7) / 0.3;
+        const scale = t < 0.2 ? 0.6 + 0.45 * (t / 0.2) : t < 0.7 ? 1.05 : 1.05 + 0.05 * ((t - 0.7) / 0.3);
+        const cx = canvas.width / 2;
+        const cy = canvas.height / 2;
+        ctx.save();
+        ctx.globalAlpha = alpha;
+        ctx.translate(cx, cy);
+        ctx.scale(scale, scale);
+        ctx.font = "bold 18px sans-serif";
+        ctx.textAlign = "center";
+        ctx.textBaseline = "middle";
+        ctx.fillStyle = "#38bdf8";
+        ctx.shadowColor = "#818cf8";
+        ctx.shadowBlur = 30;
+        ctx.fillText("✦ Welcome to the cosmos ✦", 0, 0);
+        ctx.restore();
+        return true;
+      });
+
       rafId = requestAnimationFrame(loop);
     }
     loop();
@@ -81,27 +112,7 @@ export default function ClickStarburst() {
       for (let w = 0; w < 4; w++) {
         setTimeout(() => addBurst(particlesRef.current, x, y, 20, 2 + w * 0.5), w * 140);
       }
-      // Cosmos message — plain Web Animations API, no calc(), no CSS vars
-      const msg = document.createElement("div");
-      msg.textContent = "✦ Welcome to the cosmos ✦";
-      msg.style.cssText = [
-        "position:fixed", "left:50%", "top:50%",
-        "pointer-events:none", "z-index:99998",
-        "font-size:18px", "font-weight:700", "letter-spacing:0.2em",
-        "color:#38bdf8", "text-shadow:0 0 20px #38bdf8,0 0 40px #818cf8",
-        "white-space:nowrap", "opacity:0",
-      ].join(";");
-      document.body.appendChild(msg);
-      msg.animate(
-        [
-          { opacity: 0, transform: "translate(-50%,-50%) scale(0.6)" },
-          { opacity: 1, transform: "translate(-50%,-50%) scale(1.05)", offset: 0.2 },
-          { opacity: 1, transform: "translate(-50%,-50%) scale(1)",    offset: 0.7 },
-          { opacity: 0, transform: "translate(-50%,-50%) scale(1.1)" },
-        ],
-        { duration: 2200, easing: "ease-out", fill: "forwards" }
-      );
-      setTimeout(() => msg.remove(), 2400);
+      messagesRef.current.push({ born: performance.now(), life: 2200 });
     }
 
     function handleClick(e: MouseEvent) {
